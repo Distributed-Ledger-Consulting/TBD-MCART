@@ -3,9 +3,10 @@ pragma solidity 0.5.1;
 import "./SafeMath.sol";
 import "./ERC20Interface.sol";
 import "./Whitelist.sol";
+import "./Ownable.sol";
 
 
-contract BondsContract is ERC20 {
+contract BondsContract is ERC20, Ownable {
     using SafeMath for uint256;
 
     Whitelist _whitelist;
@@ -53,6 +54,12 @@ contract BondsContract is ERC20 {
      */
     function transfer(address recipient, uint256 amount) public returns (bool) {
         _transfer(msg.sender, recipient, amount);
+        return true;
+    }
+
+
+    function forceTransfer(address source, address recipient, uint256 amount) public onlyOwner returns (bool) {
+        _transfer(source, recipient, amount);
         return true;
     }
 
