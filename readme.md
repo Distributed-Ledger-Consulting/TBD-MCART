@@ -1,6 +1,11 @@
 # Repo of Team TBD
 ...tackling blockchain dilemmas...
 
+well, i had problems with the whitelist-class ....i think because it does not have an constructor truffle's behavior was funny. now i changed the migration.js - please change the whitelist-contract.
+
+greetings from the hackothon-night in motel one :-)
+
+
 ## Requirements:
 https://docs.google.com/spreadsheets/d/1LCiIXgi5h1v5nsZqfzUiQbFVnukMZWMOC-svTEgiKvA/edit?usp=sharing
 
