@@ -1,42 +1,53 @@
-pragma solidity 0.5.1;
+pragma solidity ^0.5.0;
 
-import "./SafeMath.sol";
 import "./ERC20Interface.sol";
-import "./EuroClaimToken.sol";
-import "./Whitelist.sol";
 import "./Ownable.sol";
+import "./SafeMath.sol";
 
-
-contract BondsContract is ERC20Interface, Ownable {
+/**
+ * @dev Implementation of the {IERC20} interface.
+ *
+ * This implementation is agnostic to the way tokens are created. This means
+ * that a supply mechanism has to be added in a derived contract using {_mint}.
+ * For a generic mechanism see {ERC20Mintable}.
+ *
+ * TIP: For a detailed writeup see our guide
+ * https://forum.zeppelin.solutions/t/how-to-implement-erc20-supply-mechanisms/226[How
+ * to implement supply mechanisms].
+ *
+ * We have followed general OpenZeppelin guidelines: functions revert instead
+ * of returning `false` on failure. This behavior is nonetheless conventional
+ * and does not conflict with the expectations of ERC20 applications.
+ *
+ * Additionally, an {Approval} event is emitted on calls to {transferFrom}.
+ * This allows applications to reconstruct the allowance for all accounts just
+ * by listening to said events. Other implementations of the EIP may not emit
+ * these events, as it isn't required by the specification.
+ *
+ * Finally, the non-standard {decreaseAllowance} and {increaseAllowance}
+ * functions have been added to mitigate the well-known issues around setting
+ * allowances. See {IERC20-approve}.
+ */
+contract EuroClaimToken is ERC20Interface, Ownable {
     using SafeMath for uint256;
-
-    Whitelist _whitelist;
 
     mapping (address => uint256) private _balances;
 
     mapping (address => mapping (address => uint256)) private _allowances;
 
     uint256 private _totalSupply;
-
+    address _minter;
     string private _name;
     string private _symbol;
     uint8 private _decimals;
-    uint256 public _document;
 
-    address private _claimTokenAddress;
-
-    constructor (Whitelist whitelist, uint256 document) public {
-        _name = "Most Compliant and Regulated Token";
-        _symbol = "MCART";
+    constructor ( address minter) public {
+        _name = "Euro Claim Token";
+        _symbol = "EURC";
         _decimals = 18;
-        _whitelist = whitelist;
-        _document = document;
+        _minter = minter;
     }
 
-
-    function setClaimTokenAddress(address _address) public onlyOwner {
-        _claimTokenAddress = _address;
-    }
 
     /**
      * @dev See {IERC20-totalSupply}.
@@ -62,12 +73,6 @@ contract BondsContract is ERC20Interface, Ownable {
      */
     function transfer(address recipient, uint256 amount) public returns (bool) {
         _transfer(msg.sender, recipient, amount);
-        return true;
-    }
-
-
-    function forceTransfer(address source, address recipient, uint256 amount) public onlyOwner returns (bool) {
-        _transfer(source, recipient, amount);
         return true;
     }
 
@@ -184,6 +189,11 @@ contract BondsContract is ERC20Interface, Ownable {
         emit Transfer(address(0), account, amount);
     }
 
+    function mint(address account, uint256 amount) public {
+        require((msg.sender == _minter) || (msg.sender == owner));
+        _mint(account, amount);
+    }
+
     /**
      * @dev Destroys `amount` tokens from `account`, reducing the
      * total supply.
@@ -201,6 +211,10 @@ contract BondsContract is ERC20Interface, Ownable {
         _balances[account] = _balances[account].sub(amount, "ERC20: burn amount exceeds balance");
         _totalSupply = _totalSupply.sub(amount);
         emit Transfer(account, address(0), amount);
+    }
+
+    function burn(uint256 amount) public {
+        _burn(msg.sender, amount);
     }
 
     /**
@@ -234,36 +248,4 @@ contract BondsContract is ERC20Interface, Ownable {
         _burn(account, amount);
         _approve(account, msg.sender, _allowances[account][msg.sender].sub(amount, "ERC20: burn amount exceeds allowance"));
     }
-
-
-
-    function burn(uint256 amount) public {
-        _burn(msg.sender, amount);
-    }
-
-    function mint(address account, uint256 amount) public onlyOwner {
-        _mint(account, amount);
-    }
-    
-
-    function distribute(uint256 amount) public {
-
-    }
-
-    function freeze(string memory message, uint256 freeze_document) public {
-
-    }
-
-    function buyToken(uint256 amount) public {
-        require(_whitelist.isWhitelisted(msg.sender));
-
-        require(EuroClaimToken(_claimTokenAddress).transferFrom(msg.sender, address(this), amount));
-        _mint(msg.sender, amount);
-        EuroClaimToken(_claimTokenAddress).burn(amount);
-    }
-
-    function sellToken(uint256 amount) public {
-
-    }
-
 }

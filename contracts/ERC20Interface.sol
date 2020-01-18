@@ -3,7 +3,7 @@ pragma solidity 0.5.1;
 
 /// @title ERC20 interface
 /// @dev see https://github.com/ethereum/EIPs/issues/20
-interface ERC20 {
+interface ERC20Interface {
 
     event Transfer(address indexed from, address indexed to, uint value);
     event Approval(address indexed owner, address indexed spender, uint value);
