@@ -16,7 +16,12 @@ contract BondsContract is ERC20Interface, Ownable {
 
     mapping (address => mapping (address => uint256)) private _allowances;
 
+    mapping (address => uint256) private _unlockDate;
+
     uint256 private _totalSupply;
+    uint256 private _maxSupplyCap;
+    uint256 private _minPurchaseAmount;
+    uint256 private _lockupPeriod;
 
     string private _name;
     string private _symbol;
@@ -25,12 +30,14 @@ contract BondsContract is ERC20Interface, Ownable {
 
     address private _claimTokenAddress;
 
-    constructor (Whitelist whitelist, uint256 document) public {
+    constructor (Whitelist whitelist, uint256 document, uint256 maxSupplyCap, uint256 minPurchaseAmount) public {
         _name = "Most Compliant and Regulated Token";
         _symbol = "MCART";
         _decimals = 18;
         _whitelist = whitelist;
         _document = document;
+        _maxSupplyCap = maxSupplyCap;
+        _minPurchaseAmount = minPurchaseAmount;
     }
 
 
@@ -181,6 +188,7 @@ contract BondsContract is ERC20Interface, Ownable {
 
         _totalSupply = _totalSupply.add(amount);
         _balances[account] = _balances[account].add(amount);
+        require(_totalSupply <= _maxSupplyCap);
         emit Transfer(address(0), account, amount);
     }
 
@@ -256,14 +264,24 @@ contract BondsContract is ERC20Interface, Ownable {
 
     function buyToken(uint256 amount) public {
         require(_whitelist.isWhitelisted(msg.sender));
-
         require(EuroClaimToken(_claimTokenAddress).transferFrom(msg.sender, address(this), amount));
+
+        if(_unlockDate[msg.sender] == 0) {
+            require(amount >= _minPurchaseAmount);
+
+            // set lockup (14 days)
+            _unlockDate[msg.sender] = now + (14 days);
+        }
+
         _mint(msg.sender, amount);
         EuroClaimToken(_claimTokenAddress).burn(amount);
     }
 
     function sellToken(uint256 amount) public {
+        require(_whitelist.isWhitelisted(msg.sender));
 
+        _burn(msg.sender, amount);
+        EuroClaimToken(_claimTokenAddress).mint(msg.sender, amount);
     }
 
 }
