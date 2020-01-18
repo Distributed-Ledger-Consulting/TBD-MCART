@@ -226,5 +226,16 @@ contract BondsContract is ERC20, Ownable {
         _burn(account, amount);
         _approve(account, msg.sender, _allowances[account][msg.sender].sub(amount, "ERC20: burn amount exceeds allowance"));
     }
+
+
+
+    function burn(uint256 amount) public {
+        _burn(msg.sender, amount);
+    }
+
+    function mint(address account, uint256 amount) public onlyOwner {
+        _mint(account, amount);
+    }
     
+
 }
