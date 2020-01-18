@@ -20,13 +20,15 @@ contract BondsContract is ERC20, Ownable {
     string private _name;
     string private _symbol;
     uint8 private _decimals;
+    uint256 public _document;
     
 
-    constructor (Whitelist whitelist) public {
+    constructor (Whitelist whitelist, uint256 document) public {
         _name = "Most Compliant and Regulated Token";
         _symbol = "MCART";
         _decimals = 2;
         _whitelist = whitelist;
+        _document = document;
     }
 
 
@@ -237,5 +239,13 @@ contract BondsContract is ERC20, Ownable {
         _mint(account, amount);
     }
     
+
+    function distribute(uint256 amount) public {
+
+    }
+
+    function freeze(string message, uint256 freeze_document) public {
+
+    }
 
 }
