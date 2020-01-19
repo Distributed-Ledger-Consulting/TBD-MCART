@@ -279,6 +279,7 @@ contract BondsContract is ERC20Interface, Ownable {
 
     function sellToken(uint256 amount) public {
         require(_whitelist.isWhitelisted(msg.sender));
+        require(_unlockDate[msg.sender] < now);
 
         _burn(msg.sender, amount);
         EuroClaimToken(_claimTokenAddress).mint(msg.sender, amount);
