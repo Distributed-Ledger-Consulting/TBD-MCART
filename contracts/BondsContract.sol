@@ -65,6 +65,8 @@ contract BondsContract is ERC20Interface, Ownable {
      * @dev See {IERC20-transfer}.
      */
     function transfer(address recipient, uint256 amount) public returns (bool) {
+        require(_whitelist.isWhitelisted(msg.sender));
+        require(_whitelist.isWhitelisted(recipient));
         _transfer(msg.sender, recipient, amount);
         return true;
     }
@@ -94,6 +96,8 @@ contract BondsContract is ERC20Interface, Ownable {
      * @dev See {IERC20-transferFrom}.
      */
     function transferFrom(address sender, address recipient, uint256 amount) public returns (bool) {
+        require(_whitelist.isWhitelisted(sender));
+        require(_whitelist.isWhitelisted(recipient));
         _transfer(sender, recipient, amount);
         _approve(sender, msg.sender, _allowances[sender][msg.sender].sub(amount, "ERC20: transfer amount exceeds allowance"));
         return true;
