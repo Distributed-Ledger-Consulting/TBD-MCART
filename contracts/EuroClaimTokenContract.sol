@@ -28,7 +28,7 @@ import "./SafeMath.sol";
  * functions have been added to mitigate the well-known issues around setting
  * allowances. See {IERC20-approve}.
  */
-contract EuroClaimToken is ERC20Interface, Ownable {
+contract EuroClaimTokenContract is ERC20Interface, Ownable {
     using SafeMath for uint256;
 
     mapping (address => uint256) private _balances;

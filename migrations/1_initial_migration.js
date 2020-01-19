@@ -1,14 +1,14 @@
 const Migrations = artifacts.require("Migrations");
-const Check = artifacts.require("checkpoint");
-const Whitelist = artifacts.require("Whitelist");
-const BondsContract = artifacts.require("BondsContract")
+const WhitelistContract = artifacts.require("WhitelistContract");
+const BondsContract = artifacts.require("BondsContract");
+const EuroClaimTokenContract = artifacts.require("EuroClaimTokenContract");
 
 
 
 var rc;
 
 
-const konto1 = '0x48E3c1F06b3dbE6bfe9591a354Dd0b0Ffa6b0a7e';
+const konto1 = '0xeffa10cfe2bc343083ef6b10c4e2bf6fe762e9e7';
 const konto2 = '0x1e9F566a321b18039c167E4b7b02377f18C0A041';
 const konto3 = '0x43226e185d3cF7906Dc7c90cc51D43e7606E7dC3';
 const konto4 = '0xeF482B3C2BeF6262c6D685537a03f6c3bb8732D3';
@@ -22,7 +22,7 @@ module.exports = async function(deployer) {
   await deployer.deploy(Migrations);
 
   konten=new Array();
-   konten[0] = '0x48E3c1F06b3dbE6bfe9591a354Dd0b0Ffa6b0a7e';
+   konten[0] = '0xeffa10cfe2bc343083ef6b10c4e2bf6fe762e9e7';
    konten[1] = '0x1e9F566a321b18039c167E4b7b02377f18C0A041';
    konten[2] = '0x43226e185d3cF7906Dc7c90cc51D43e7606E7dC3';
    konten[3] = '0xeF482B3C2BeF6262c6D685537a03f6c3bb8732D3';
@@ -33,19 +33,19 @@ module.exports = async function(deployer) {
 
 
    kandidaten=new Array();
-   konten[0] = '0x48E3c1F06b3dbE6bfe9591a354Dd0b0Ffa6b0a7e';
+   konten[0] = '0xeffa10cfe2bc343083ef6b10c4e2bf6fe762e9e7';
    konten[1] = '0x1e9F566a321b18039c167E4b7b02377f18C0A041';
 
-  console.log("<<< checkpoint >>>");  
-  let a = await deployer.deploy(Check);
-  value = await a.check();
-  console.log("Check Adresse:" + value);
+  // console.log("<<< checkpoint >>>");  
+  // let a = await deployer.deploy(Check);
+  // value = await a.check();
+  // console.log("Check Adresse:" + value);
 
 
   console.log("<<< whitelist >>>");  
-  let wl = await deployer.deploy(Whitelist);
-  value = await wl.gibAnzahl();
-  console.log("Whitelist:" + value[0]);
+  let wl = await deployer.deploy(WhitelistContract);
+  //value = await wl.gibAnzahl();
+  //console.log("Whitelist:" + value[0]);
 
 
   //

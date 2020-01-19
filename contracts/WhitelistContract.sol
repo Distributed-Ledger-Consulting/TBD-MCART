@@ -5,7 +5,7 @@ import "./Ownable.sol";
 
 /// @title Whitelist
 /// @author STOKR
-contract Whitelist is Ownable {
+contract WhitelistContract is Ownable {
 
     // Set of Whitelisted addresses
     mapping(address => bool) public isWhitelisted;

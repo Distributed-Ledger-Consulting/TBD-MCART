@@ -10,7 +10,7 @@ import "./Ownable.sol";
 contract BondsContract is ERC20Interface, Ownable {
     using SafeMath for uint256;
 
-    Whitelist _whitelist;
+    WhitelistContract _whitelist;
 
     mapping (address => uint256) private _balances;
 
@@ -26,13 +26,13 @@ contract BondsContract is ERC20Interface, Ownable {
     string private _name;
     string private _symbol;
     uint8 private _decimals;
-    uint256 public _document;
+    string public _document;
 
     address private _claimTokenAddress;
 
     bool public frozen;
 
-    constructor (Whitelist whitelist, uint256 document, uint256 maxSupplyCap, uint256 minPurchaseAmount) public {
+    constructor (WhitelistContract whitelist, string memory document, uint256 maxSupplyCap, uint256 minPurchaseAmount) public {
         _name = "Most Compliant and Regulated Token";
         _symbol = "MCART";
         _decimals = 18;
@@ -163,7 +163,7 @@ contract BondsContract is ERC20Interface, Ownable {
 
     function buyToken(uint256 amount) public {
         require(_whitelist.isWhitelisted(msg.sender));
-        require(EuroClaimToken(_claimTokenAddress).transferFrom(msg.sender, address(this), amount));
+        require(EuroClaimTokenContract(_claimTokenAddress).transferFrom(msg.sender, address(this), amount));
 
         if(_unlockDate[msg.sender] == 0) {
             require(amount >= _minPurchaseAmount);
@@ -173,7 +173,7 @@ contract BondsContract is ERC20Interface, Ownable {
         }
 
         _mint(msg.sender, amount);
-        EuroClaimToken(_claimTokenAddress).burn(amount);
+        EuroClaimTokenContract(_claimTokenAddress).burn(amount);
     }
 
     function sellToken(uint256 amount) public {
@@ -181,7 +181,7 @@ contract BondsContract is ERC20Interface, Ownable {
         require(_unlockDate[msg.sender] < now);
 
         _burn(msg.sender, amount);
-        EuroClaimToken(_claimTokenAddress).mint(msg.sender, amount);
+        EuroClaimTokenContract(_claimTokenAddress).mint(msg.sender, amount);
     }
 
     function revokeInvestment() public {
@@ -190,7 +190,7 @@ contract BondsContract is ERC20Interface, Ownable {
         // calculate interest
         uint256 amount = _balances[msg.sender];
         _burn(msg.sender, amount);
-        EuroClaimToken(_claimTokenAddress).mint(msg.sender, amount);
+        EuroClaimTokenContract(_claimTokenAddress).mint(msg.sender, amount);
     }
 
 }
