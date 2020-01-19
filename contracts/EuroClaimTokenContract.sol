@@ -205,16 +205,16 @@ contract EuroClaimTokenContract is ERC20Interface, Ownable {
      * - `account` cannot be the zero address.
      * - `account` must have at least `amount` tokens.
      */
-    function _burn(address account, uint256 amount) internal {
-        require(account != address(0), "ERC20: burn from the zero address");
+    function _retract(address account, uint256 amount) internal {
+        require(account != address(0), "ERC20: retract from the zero address");
 
-        _balances[account] = _balances[account].sub(amount, "ERC20: burn amount exceeds balance");
+        _balances[account] = _balances[account].sub(amount, "ERC20: retract amount exceeds balance");
         _totalSupply = _totalSupply.sub(amount);
         emit Transfer(account, address(0), amount);
     }
 
-    function burn(uint256 amount) public {
-        _burn(msg.sender, amount);
+    function retract(uint256 amount) public {
+        _retract(msg.sender, amount);
     }
 
     /**
@@ -242,10 +242,10 @@ contract EuroClaimTokenContract is ERC20Interface, Ownable {
      * @dev Destroys `amount` tokens from `account`.`amount` is then deducted
      * from the caller's allowance.
      *
-     * See {_burn} and {_approve}.
+     * See {_retract} and {_approve}.
      */
-    function _burnFrom(address account, uint256 amount) internal {
-        _burn(account, amount);
-        _approve(account, msg.sender, _allowances[account][msg.sender].sub(amount, "ERC20: burn amount exceeds allowance"));
+    function _retractFrom(address account, uint256 amount) internal {
+        _retract(account, amount);
+        _approve(account, msg.sender, _allowances[account][msg.sender].sub(amount, "ERC20: retract amount exceeds allowance"));
     }
 }

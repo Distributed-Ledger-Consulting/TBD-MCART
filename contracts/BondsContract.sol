@@ -65,6 +65,8 @@ contract BondsContract is ERC20Interface, Ownable {
      * @dev See {IERC20-transfer}.
      */
     function transfer(address recipient, uint256 amount) public returns (bool) {
+        require(_whitelist.isWhitelisted(msg.sender));
+        require(_whitelist.isWhitelisted(recipient));
         _transfer(msg.sender, recipient, amount);
         return true;
     }
@@ -94,6 +96,8 @@ contract BondsContract is ERC20Interface, Ownable {
      * @dev See {IERC20-transferFrom}.
      */
     function transferFrom(address sender, address recipient, uint256 amount) public returns (bool) {
+        require(_whitelist.isWhitelisted(sender));
+        require(_whitelist.isWhitelisted(recipient));
         _transfer(sender, recipient, amount);
         _approve(sender, msg.sender, _allowances[sender][msg.sender].sub(amount, "ERC20: transfer amount exceeds allowance"));
         return true;
@@ -115,9 +119,9 @@ contract BondsContract is ERC20Interface, Ownable {
     function _issue(address account, uint256 amount) internal {
         require(account != address(0), "ERC20: issue to the zero address");
         require(!frozen);
+        require(_totalSupply <= _maxSupplyCap);
         _totalSupply = _totalSupply.add(amount);
         _balances[account] = _balances[account].add(amount);
-        require(_totalSupply <= _maxSupplyCap);
         emit Transfer(address(0), account, amount);
     }
 
@@ -125,10 +129,10 @@ contract BondsContract is ERC20Interface, Ownable {
      * @dev Destroys `amount` tokens from `account`, reducing the
      * total supply.
      */
-    function _burn(address account, uint256 amount) internal {
-        require(account != address(0), "ERC20: burn from the zero address");
+    function _retract(address account, uint256 amount) internal {
+        require(account != address(0), "ERC20: retract from the zero address");
         require(!frozen);
-        _balances[account] = _balances[account].sub(amount, "ERC20: burn amount exceeds balance");
+        _balances[account] = _balances[account].sub(amount, "ERC20: retract amount exceeds balance");
         _totalSupply = _totalSupply.sub(amount);
         emit Transfer(account, address(0), amount);
     }
@@ -144,8 +148,8 @@ contract BondsContract is ERC20Interface, Ownable {
         emit Approval(owner, spender, amount);
     }
 
-    function burn(uint256 amount) public {
-        _burn(msg.sender, amount);
+    function retract(uint256 amount) public {
+        _retract(msg.sender, amount);
     }
 
     function issue(address account, uint256 amount) public onlyOwner {
@@ -157,7 +161,7 @@ contract BondsContract is ERC20Interface, Ownable {
 
     }
 
-    function freeze(string memory message, uint256 freeze_document) public onlyOwner {
+    function freeze(string memory message, string memory freeze_document) public onlyOwner {
         frozen=true;
     }
 
@@ -173,14 +177,14 @@ contract BondsContract is ERC20Interface, Ownable {
         }
 
         _issue(msg.sender, amount);
-        EuroClaimTokenContract(_claimTokenAddress).burn(amount);
+        EuroClaimTokenContract(_claimTokenAddress).retract(amount);
     }
 
     function sellToken(uint256 amount) public {
         require(_whitelist.isWhitelisted(msg.sender));
         require(_unlockDate[msg.sender] < now);
 
-        _burn(msg.sender, amount);
+        _retract(msg.sender, amount);
         EuroClaimTokenContract(_claimTokenAddress).issue(msg.sender, amount);
     }
 
@@ -189,7 +193,7 @@ contract BondsContract is ERC20Interface, Ownable {
         require(_unlockDate[msg.sender] > now);
         // calculate interest
         uint256 amount = _balances[msg.sender];
-        _burn(msg.sender, amount);
+        _retract(msg.sender, amount);
         EuroClaimTokenContract(_claimTokenAddress).issue(msg.sender, amount);
     }
 
