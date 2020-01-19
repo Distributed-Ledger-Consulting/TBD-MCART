@@ -188,6 +188,7 @@ contract BondsContract is ERC20Interface, Ownable {
         require(_whitelist.isWhitelisted(msg.sender));
         require(_unlockDate[msg.sender] > now);
         // calculate interest
+        uint256 amount = _balances[msg.sender];
         _burn(msg.sender, amount);
         EuroClaimToken(_claimTokenAddress).mint(msg.sender, amount);
     }
