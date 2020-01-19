@@ -8,8 +8,8 @@ import "./SafeMath.sol";
  * @dev Implementation of the {IERC20} interface.
  *
  * This implementation is agnostic to the way tokens are created. This means
- * that a supply mechanism has to be added in a derived contract using {_mint}.
- * For a generic mechanism see {ERC20Mintable}.
+ * that a supply mechanism has to be added in a derived contract using {_issue}.
+ * For a generic mechanism see {ERC20issueable}.
  *
  * TIP: For a detailed writeup see our guide
  * https://forum.zeppelin.solutions/t/how-to-implement-erc20-supply-mechanisms/226[How
@@ -36,16 +36,16 @@ contract EuroClaimTokenContract is ERC20Interface, Ownable {
     mapping (address => mapping (address => uint256)) private _allowances;
 
     uint256 private _totalSupply;
-    address _minter;
+    address _issueer;
     string private _name;
     string private _symbol;
     uint8 private _decimals;
 
-    constructor ( address minter) public {
+    constructor ( address issueer) public {
         _name = "Euro Claim Token";
         _symbol = "EURC";
         _decimals = 18;
-        _minter = minter;
+        _issueer = issueer;
     }
 
 
@@ -181,17 +181,17 @@ contract EuroClaimTokenContract is ERC20Interface, Ownable {
      *
      * - `to` cannot be the zero address.
      */
-    function _mint(address account, uint256 amount) internal {
-        require(account != address(0), "ERC20: mint to the zero address");
+    function _issue(address account, uint256 amount) internal {
+        require(account != address(0), "ERC20: issue to the zero address");
 
         _totalSupply = _totalSupply.add(amount);
         _balances[account] = _balances[account].add(amount);
         emit Transfer(address(0), account, amount);
     }
 
-    function mint(address account, uint256 amount) public {
-        require((msg.sender == _minter) || (msg.sender == owner));
-        _mint(account, amount);
+    function issue(address account, uint256 amount) public {
+        require((msg.sender == _issueer) || (msg.sender == owner));
+        _issue(account, amount);
     }
 
     /**

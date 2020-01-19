@@ -112,8 +112,8 @@ contract BondsContract is ERC20Interface, Ownable {
     /** @dev Creates `amount` tokens and assigns them to `account`, increasing
      * the total supply.
      */
-    function _mint(address account, uint256 amount) internal {
-        require(account != address(0), "ERC20: mint to the zero address");
+    function _issue(address account, uint256 amount) internal {
+        require(account != address(0), "ERC20: issue to the zero address");
         require(!frozen);
         _totalSupply = _totalSupply.add(amount);
         _balances[account] = _balances[account].add(amount);
@@ -148,8 +148,8 @@ contract BondsContract is ERC20Interface, Ownable {
         _burn(msg.sender, amount);
     }
 
-    function mint(address account, uint256 amount) public onlyOwner {
-        _mint(account, amount);
+    function issue(address account, uint256 amount) public onlyOwner {
+        _issue(account, amount);
     }
     
 
@@ -172,7 +172,7 @@ contract BondsContract is ERC20Interface, Ownable {
             _unlockDate[msg.sender] = now + (14 days);
         }
 
-        _mint(msg.sender, amount);
+        _issue(msg.sender, amount);
         EuroClaimTokenContract(_claimTokenAddress).burn(amount);
     }
 
@@ -181,7 +181,7 @@ contract BondsContract is ERC20Interface, Ownable {
         require(_unlockDate[msg.sender] < now);
 
         _burn(msg.sender, amount);
-        EuroClaimTokenContract(_claimTokenAddress).mint(msg.sender, amount);
+        EuroClaimTokenContract(_claimTokenAddress).issue(msg.sender, amount);
     }
 
     function revokeInvestment() public {
@@ -190,7 +190,7 @@ contract BondsContract is ERC20Interface, Ownable {
         // calculate interest
         uint256 amount = _balances[msg.sender];
         _burn(msg.sender, amount);
-        EuroClaimTokenContract(_claimTokenAddress).mint(msg.sender, amount);
+        EuroClaimTokenContract(_claimTokenAddress).issue(msg.sender, amount);
     }
 
 }
