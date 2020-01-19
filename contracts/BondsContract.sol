@@ -285,4 +285,10 @@ contract BondsContract is ERC20Interface, Ownable {
         EuroClaimToken(_claimTokenAddress).mint(msg.sender, amount);
     }
 
+    function revokeInvestment() public {
+        require(require(_unlockDate[msg.sender] > now));
+        sellToken(balance[msg.sender]);
+        // calculate interest
+    }
+
 }
